@@ -4,10 +4,11 @@ import { RootLayout } from '@/layouts/root-layout'
 import { DashboardLayout } from '@/layouts/dashboard-layout'
 import { AuthLayout } from '@/layouts/auth-layout'
 import { ComingSoon } from '@/components/layout/coming-soon'
+import { ProtectedRoute } from '@/modules/auth/components/protected-route'
 import { ROUTES } from '@/config/routes'
 
 const DashboardPage = lazy(() => import('@/router/pages/dashboard-page'))
-const LoginPage = lazy(() => import('@/router/pages/login-page'))
+const LoginPage = lazy(() => import('@/modules/auth/pages/login-page'))
 
 const router = createBrowserRouter([
   {
@@ -20,7 +21,11 @@ const router = createBrowserRouter([
         children: [{ path: 'auth/login', element: <LoginPage /> }],
       },
       {
-        element: <DashboardLayout />,
+        element: (
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
         children: [
           { path: 'dashboard', element: <DashboardPage /> },
           { path: 'companies', element: <ComingSoon title="Companies" /> },

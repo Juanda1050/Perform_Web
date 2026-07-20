@@ -1,26 +1,74 @@
-import axios from 'axios'
+import axios, { type InternalAxiosRequestConfig } from 'axios'
+import { env } from '@/config/env'
+import { useAuthStore } from '@/store/auth-store'
+
+interface RetryableConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean
+}
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api/v1',
+  baseURL: env.apiBaseUrl,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+const refreshClient = axios.create({
+  baseURL: env.apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken')
+  const token = useAuthStore.getState().accessToken
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
 
+let refreshPromise: Promise<string> | null = null
+
+async function refreshAccessToken(): Promise<string> {
+  const refreshToken = useAuthStore.getState().refreshToken
+  if (!refreshToken) {
+    throw new Error('No refresh token available')
+  }
+
+  const { data } = await refreshClient.post<{ accessToken: string; refreshToken: string }>(
+    '/auth/refresh',
+    { refreshToken },
+  )
+
+  useAuthStore.getState().setTokens(data)
+  return data.accessToken
+}
+
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('accessToken')
+  async (error) => {
+    const config = error.config as RetryableConfig | undefined
+
+    if (error.response?.status !== 401 || !config || config._retry) {
+      if (error.response?.status === 401) {
+        useAuthStore.getState().clearAuth()
+      }
+      return Promise.reject(error)
     }
-    return Promise.reject(error)
+
+    config._retry = true
+
+    try {
+      refreshPromise ??= refreshAccessToken().finally(() => {
+        refreshPromise = null
+      })
+      const accessToken = await refreshPromise
+      config.headers.Authorization = `Bearer ${accessToken}`
+      return apiClient(config)
+    } catch (refreshError) {
+      useAuthStore.getState().clearAuth()
+      return Promise.reject(refreshError)
+    }
   },
 )

@@ -1,6 +1,6 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { SidebarTrigger } from '@/components/ui/sidebar'
+import { UserMenu } from '@/modules/auth/components/user-menu'
 
 export function AppTopbar() {
   return (
@@ -9,9 +9,7 @@ export function AppTopbar() {
         <SidebarTrigger />
         <Separator orientation="vertical" className="h-6" />
       </div>
-      <Avatar className="size-8">
-        <AvatarFallback>PF</AvatarFallback>
-      </Avatar>
+      <UserMenu />
     </header>
   )
 }
