@@ -1,20 +1,38 @@
-import { apiClient } from '@/api/client'
+import { supabase } from '@/config/supabase'
 import type { AuthUser } from '@/types/auth'
-import { authUserSchema, loginResponseSchema } from '@/modules/auth/schemas/auth-response-schema'
-import type { LoginRequest, LoginResponse } from '@/modules/auth/types/auth'
+import type { AuthOutcome, LoginRequest, RegisterRequest } from '@/modules/auth/types/auth'
+import { mapSupabaseUser } from '@/modules/auth/utils/map-supabase-user'
 
 export const authService = {
-  async login(payload: LoginRequest): Promise<LoginResponse> {
-    const { data } = await apiClient.post('/auth/login', payload)
-    return loginResponseSchema.parse(data)
+  async login(payload: LoginRequest): Promise<AuthUser> {
+    const { data, error } = await supabase.auth.signInWithPassword(payload)
+    if (error) throw error
+    return mapSupabaseUser(data.user)
+  },
+
+  async register(
+    payload: RegisterRequest,
+  ): Promise<{ outcome: AuthOutcome; user: AuthUser | null }> {
+    const { data, error } = await supabase.auth.signUp({
+      email: payload.email,
+      password: payload.password,
+      options: {
+        data: {
+          fullName: payload.fullName,
+          companyName: payload.companyName,
+        },
+      },
+    })
+    if (error) throw error
+
+    if (data.session && data.user) {
+      return { outcome: 'signed-in', user: mapSupabaseUser(data.user) }
+    }
+    return { outcome: 'confirmation-required', user: null }
   },
 
   async logout(): Promise<void> {
-    await apiClient.post('/auth/logout')
-  },
-
-  async getCurrentUser(): Promise<AuthUser> {
-    const { data } = await apiClient.get('/auth/me')
-    return authUserSchema.parse(data)
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
   },
 }

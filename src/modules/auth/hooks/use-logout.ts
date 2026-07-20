@@ -5,12 +5,12 @@ import { useAuthStore } from '@/store/auth-store'
 
 export function useLogout() {
   const queryClient = useQueryClient()
-  const clearAuth = useAuthStore((state) => state.clearAuth)
+  const setUser = useAuthStore((state) => state.setUser)
 
   return useMutation({
     mutationFn: () => authService.logout(),
     onSettled: () => {
-      clearAuth()
+      setUser(null)
       queryClient.clear()
       toast.success('Signed out')
     },

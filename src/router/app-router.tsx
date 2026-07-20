@@ -9,6 +9,7 @@ import { ROUTES } from '@/config/routes'
 
 const DashboardPage = lazy(() => import('@/router/pages/dashboard-page'))
 const LoginPage = lazy(() => import('@/modules/auth/pages/login-page'))
+const RegisterPage = lazy(() => import('@/modules/auth/pages/register-page'))
 
 const router = createBrowserRouter([
   {
@@ -18,7 +19,10 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to={ROUTES.dashboard} replace /> },
       {
         element: <AuthLayout />,
-        children: [{ path: 'auth/login', element: <LoginPage /> }],
+        children: [
+          { path: 'auth/login', element: <LoginPage /> },
+          { path: 'auth/register', element: <RegisterPage /> },
+        ],
       },
       {
         element: (

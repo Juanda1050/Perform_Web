@@ -9,7 +9,12 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const isInitialized = useAuthStore((state) => state.isInitialized)
   const location = useLocation()
+
+  if (!isInitialized) {
+    return null
+  }
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.login} state={{ from: location.pathname }} replace />

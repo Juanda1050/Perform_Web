@@ -25,8 +25,10 @@ function getInitials(name: string) {
 
 export function UserMenu() {
   const navigate = useNavigate()
-  const { data: user } = useCurrentUser()
+  const user = useCurrentUser()
   const logout = useLogout()
+
+  const label = user?.fullName ?? user?.email ?? 'Account'
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -38,12 +40,12 @@ export function UserMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger className="rounded-full" aria-label="Open user menu">
         <Avatar className="size-8">
-          <AvatarFallback>{user ? getInitials(user.name) : '…'}</AvatarFallback>
+          <AvatarFallback>{user ? getInitials(label) : '…'}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>{user?.name ?? 'Account'}</DropdownMenuLabel>
+          <DropdownMenuLabel>{label}</DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} disabled={logout.isPending}>

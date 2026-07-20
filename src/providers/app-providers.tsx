@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { queryClient } from '@/lib/query-client'
 import { env } from '@/config/env'
+import { AuthListener } from '@/modules/auth/components/auth-listener'
 
 interface AppProvidersProps {
   children: ReactNode
@@ -13,6 +14,7 @@ interface AppProvidersProps {
 export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
+      <AuthListener />
       <TooltipProvider delay={200}>
         {children}
         <Toaster richColors position="top-right" />
