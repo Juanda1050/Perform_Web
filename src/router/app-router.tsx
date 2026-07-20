@@ -1,14 +1,42 @@
 import { Suspense, lazy } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { Navigate, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { RootLayout } from '@/layouts/root-layout'
+import { DashboardLayout } from '@/layouts/dashboard-layout'
+import { AuthLayout } from '@/layouts/auth-layout'
+import { ComingSoon } from '@/components/layout/coming-soon'
+import { ROUTES } from '@/config/routes'
 
-const IndexPage = lazy(() => import('@/router/index-page'))
+const DashboardPage = lazy(() => import('@/router/pages/dashboard-page'))
+const LoginPage = lazy(() => import('@/router/pages/login-page'))
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <RootLayout />,
-    children: [{ index: true, element: <IndexPage /> }],
+    children: [
+      { index: true, element: <Navigate to={ROUTES.dashboard} replace /> },
+      {
+        element: <AuthLayout />,
+        children: [{ path: 'auth/login', element: <LoginPage /> }],
+      },
+      {
+        element: <DashboardLayout />,
+        children: [
+          { path: 'dashboard', element: <DashboardPage /> },
+          { path: 'companies', element: <ComingSoon title="Companies" /> },
+          { path: 'departments', element: <ComingSoon title="Departments" /> },
+          { path: 'employees', element: <ComingSoon title="Employees" /> },
+          { path: 'objectives', element: <ComingSoon title="Objectives" /> },
+          { path: 'kpis', element: <ComingSoon title="KPIs" /> },
+          { path: 'results', element: <ComingSoon title="Results" /> },
+          { path: 'reports', element: <ComingSoon title="Reports" /> },
+          { path: 'invitations', element: <ComingSoon title="Invitations" /> },
+          { path: 'audit', element: <ComingSoon title="Audit" /> },
+          { path: 'users', element: <ComingSoon title="Users" /> },
+          { path: 'settings', element: <ComingSoon title="Settings" /> },
+        ],
+      },
+    ],
   },
 ])
 
