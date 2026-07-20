@@ -10,6 +10,8 @@ import { ROUTES } from '@/config/routes'
 const DashboardPage = lazy(() => import('@/router/pages/dashboard-page'))
 const LoginPage = lazy(() => import('@/modules/auth/pages/login-page'))
 const RegisterPage = lazy(() => import('@/modules/auth/pages/register-page'))
+const CompaniesPage = lazy(() => import('@/modules/companies/pages/companies-page'))
+const UsersPage = lazy(() => import('@/modules/users/pages/users-page'))
 
 const router = createBrowserRouter([
   {
@@ -32,7 +34,7 @@ const router = createBrowserRouter([
         ),
         children: [
           { path: 'dashboard', element: <DashboardPage /> },
-          { path: 'companies', element: <ComingSoon title="Companies" /> },
+          { path: 'companies', element: <CompaniesPage /> },
           { path: 'departments', element: <ComingSoon title="Departments" /> },
           { path: 'employees', element: <ComingSoon title="Employees" /> },
           { path: 'objectives', element: <ComingSoon title="Objectives" /> },
@@ -41,7 +43,7 @@ const router = createBrowserRouter([
           { path: 'reports', element: <ComingSoon title="Reports" /> },
           { path: 'invitations', element: <ComingSoon title="Invitations" /> },
           { path: 'audit', element: <ComingSoon title="Audit" /> },
-          { path: 'users', element: <ComingSoon title="Users" /> },
+          { path: 'users', element: <UsersPage /> },
           { path: 'settings', element: <ComingSoon title="Settings" /> },
         ],
       },

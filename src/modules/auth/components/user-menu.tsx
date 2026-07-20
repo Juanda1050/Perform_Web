@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ROUTES } from '@/config/routes'
 import { useCurrentUser } from '@/modules/auth/hooks/use-current-user'
+import { useCurrentUserProfile } from '@/modules/auth/hooks/use-current-user-profile'
 import { useLogout } from '@/modules/auth/hooks/use-logout'
 
 function getInitials(name: string) {
@@ -26,9 +27,11 @@ function getInitials(name: string) {
 export function UserMenu() {
   const navigate = useNavigate()
   const user = useCurrentUser()
+  const { data: profile } = useCurrentUserProfile()
   const logout = useLogout()
 
   const label = user?.fullName ?? user?.email ?? 'Account'
+  const roleAndCompany = [profile?.role?.name, profile?.company?.name].filter(Boolean).join(' · ')
 
   const handleLogout = () => {
     logout.mutate(undefined, {
@@ -45,7 +48,14 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
-          <DropdownMenuLabel>{label}</DropdownMenuLabel>
+          <DropdownMenuLabel>
+            <div className="flex flex-col">
+              <span>{label}</span>
+              {roleAndCompany ? (
+                <span className="text-muted-foreground text-xs font-normal">{roleAndCompany}</span>
+              ) : null}
+            </div>
+          </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} disabled={logout.isPending}>
